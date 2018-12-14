@@ -1,0 +1,119 @@
+<canvas id="gc" width="400" height="400"></canvas>
+<script type="text/javascript">
+
+function int(a) {
+	return Math.floor(a + 0.5)
+}
+
+window.onload=function() {
+	canvas =document.getElementById("gc");
+	context = canvas.getContext("2d");
+	fontHeight = 20;
+	context.font = `${fontHeight}px Comic Sans MS`;
+	barHeight = int(fontHeight * 1.5);
+    context.fillStyle="black";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+	document.addEventListener("keydown", keyPush);
+	init();
+    setInterval(game, 1000 / 15);
+}
+
+function drawCell(p) {
+    context.fillRect(p.x * size, barHeight + p.y * size, size - 2, size - 2);
+}
+
+class Pnt {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+Pnt.prototype.equals = function (o) {
+    return this.x == o.x && this.y == o.y;
+};
+
+function inPath(q) {
+	for (p of path)
+		if (q.equals(p))
+			return true;
+	return false;
+}
+
+function genEat() {
+	while (true) {
+		eat = new Pnt(
+			int(Math.random() * (w - 1)),
+			int(Math.random() * (h - 1)),
+		);
+		if (!inPath(eat))
+			break;
+	}
+   	context.fillStyle="red";
+   	drawCell(eat);
+}
+
+function init() {
+	size = 15;
+	w = int(Math.floor(canvas.width / size));
+	h = int(Math.floor((canvas.height - barHeight) / size));
+	x = int(w / 2); 
+	y = int(h / 2);
+	dx = 1; dy = 0;
+	max = 0;
+	path = [];
+	paused = false;
+	genEat();
+}
+
+function game() {
+    if (paused) {
+    	return
+    }
+
+    context.fillStyle="white";
+    context.fillRect(0, 0, canvas.width, barHeight);
+    if (path.length >= max) {
+    	max = path.length;
+	    context.fillStyle="black";
+	    msg = `Your lenght is ${path.length}. `;
+	    context.fillText(`${msg}AWESOME!`, 10, fontHeight);
+	    context.fillStyle="red";
+	    context.fillText(`AWESOME!`, 10 - 2 + context.measureText(msg).width, fontHeight - 2);
+    } else {
+	    context.fillStyle="black";
+	    context.fillText(`Your lenght is ${path.length}`, 10, fontHeight);
+	}
+
+    x = int((x + dx + w) % w);
+    y = int((y + dy + h) % h);
+    q = new Pnt(x, y);
+
+    if (inPath(q)) {
+	   	context.fillStyle="black";
+    	for (p of path)
+	    	drawCell(p);
+    	path = [];
+    } else if (path.length > 0) {
+	    context.fillStyle="lime";
+	    drawCell(path[path.length - 1]);
+    }
+    path.push(q);
+    context.fillStyle="#0000FF";
+    drawCell(q);
+    if (q.equals(eat)) {
+    	genEat();
+    } else if (path.length > 1) {
+	   	context.fillStyle="black";
+	    drawCell(path[0]);
+	    path.shift();
+	}
+}
+
+function keyPush(evt) {
+	if (evt.keyCode == 37) { dx = -1; dy = 0; }
+	if (evt.keyCode == 38) { dx = 0; dy = -1; }
+	if (evt.keyCode == 39) { dx = 1; dy = 0; }
+	if (evt.keyCode == 40) { dx = 0; dy = 1; }
+	if (evt.keyCode == 'P'.charCodeAt(0)) { paused ^= 1; }
+}
+</script>
