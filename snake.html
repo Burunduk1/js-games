@@ -75,13 +75,13 @@ function game() {
     if (path.length >= max) {
     	max = path.length;
 	    context.fillStyle="black";
-	    msg = `Your lenght is ${path.length}. `;
+	    msg = `Your length is ${path.length}. `;
 	    context.fillText(`${msg}AWESOME!`, 10, fontHeight);
 	    context.fillStyle="red";
 	    context.fillText(`AWESOME!`, 10 - 2 + context.measureText(msg).width, fontHeight - 2);
     } else {
 	    context.fillStyle="black";
-	    context.fillText(`Your lenght is ${path.length}`, 10, fontHeight);
+	    context.fillText(`Your length is ${path.length}`, 10, fontHeight);
 	}
 
     x = int((x + dx + w) % w);
